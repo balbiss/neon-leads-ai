@@ -9,38 +9,194 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SignupRouteImport } from './routes/signup'
+import { Route as SettingsRouteImport } from './routes/settings'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
+import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as LeadsIndexRouteImport } from './routes/leads.index'
+import { Route as ExtractionsIndexRouteImport } from './routes/extractions.index'
+import { Route as LeadsLeadIdRouteImport } from './routes/leads.$leadId'
+import { Route as ExtractionsNewRouteImport } from './routes/extractions.new'
 
+const SignupRoute = SignupRouteImport.update({
+  id: '/signup',
+  path: '/signup',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SettingsRoute = SettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
+  id: '/forgot-password',
+  path: '/forgot-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardRoute = DashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LeadsIndexRoute = LeadsIndexRouteImport.update({
+  id: '/leads/',
+  path: '/leads/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ExtractionsIndexRoute = ExtractionsIndexRouteImport.update({
+  id: '/extractions/',
+  path: '/extractions/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LeadsLeadIdRoute = LeadsLeadIdRouteImport.update({
+  id: '/leads/$leadId',
+  path: '/leads/$leadId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ExtractionsNewRoute = ExtractionsNewRouteImport.update({
+  id: '/extractions/new',
+  path: '/extractions/new',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/dashboard': typeof DashboardRoute
+  '/forgot-password': typeof ForgotPasswordRoute
+  '/login': typeof LoginRoute
+  '/settings': typeof SettingsRoute
+  '/signup': typeof SignupRoute
+  '/extractions/new': typeof ExtractionsNewRoute
+  '/leads/$leadId': typeof LeadsLeadIdRoute
+  '/extractions/': typeof ExtractionsIndexRoute
+  '/leads/': typeof LeadsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/dashboard': typeof DashboardRoute
+  '/forgot-password': typeof ForgotPasswordRoute
+  '/login': typeof LoginRoute
+  '/settings': typeof SettingsRoute
+  '/signup': typeof SignupRoute
+  '/extractions/new': typeof ExtractionsNewRoute
+  '/leads/$leadId': typeof LeadsLeadIdRoute
+  '/extractions': typeof ExtractionsIndexRoute
+  '/leads': typeof LeadsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/dashboard': typeof DashboardRoute
+  '/forgot-password': typeof ForgotPasswordRoute
+  '/login': typeof LoginRoute
+  '/settings': typeof SettingsRoute
+  '/signup': typeof SignupRoute
+  '/extractions/new': typeof ExtractionsNewRoute
+  '/leads/$leadId': typeof LeadsLeadIdRoute
+  '/extractions/': typeof ExtractionsIndexRoute
+  '/leads/': typeof LeadsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/dashboard'
+    | '/forgot-password'
+    | '/login'
+    | '/settings'
+    | '/signup'
+    | '/extractions/new'
+    | '/leads/$leadId'
+    | '/extractions/'
+    | '/leads/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/dashboard'
+    | '/forgot-password'
+    | '/login'
+    | '/settings'
+    | '/signup'
+    | '/extractions/new'
+    | '/leads/$leadId'
+    | '/extractions'
+    | '/leads'
+  id:
+    | '__root__'
+    | '/'
+    | '/dashboard'
+    | '/forgot-password'
+    | '/login'
+    | '/settings'
+    | '/signup'
+    | '/extractions/new'
+    | '/leads/$leadId'
+    | '/extractions/'
+    | '/leads/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  DashboardRoute: typeof DashboardRoute
+  ForgotPasswordRoute: typeof ForgotPasswordRoute
+  LoginRoute: typeof LoginRoute
+  SettingsRoute: typeof SettingsRoute
+  SignupRoute: typeof SignupRoute
+  ExtractionsNewRoute: typeof ExtractionsNewRoute
+  LeadsLeadIdRoute: typeof LeadsLeadIdRoute
+  ExtractionsIndexRoute: typeof ExtractionsIndexRoute
+  LeadsIndexRoute: typeof LeadsIndexRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/signup': {
+      id: '/signup'
+      path: '/signup'
+      fullPath: '/signup'
+      preLoaderRoute: typeof SignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/settings': {
+      id: '/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/forgot-password': {
+      id: '/forgot-password'
+      path: '/forgot-password'
+      fullPath: '/forgot-password'
+      preLoaderRoute: typeof ForgotPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard': {
+      id: '/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,21 +204,49 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/leads/': {
+      id: '/leads/'
+      path: '/leads'
+      fullPath: '/leads/'
+      preLoaderRoute: typeof LeadsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/extractions/': {
+      id: '/extractions/'
+      path: '/extractions'
+      fullPath: '/extractions/'
+      preLoaderRoute: typeof ExtractionsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/leads/$leadId': {
+      id: '/leads/$leadId'
+      path: '/leads/$leadId'
+      fullPath: '/leads/$leadId'
+      preLoaderRoute: typeof LeadsLeadIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/extractions/new': {
+      id: '/extractions/new'
+      path: '/extractions/new'
+      fullPath: '/extractions/new'
+      preLoaderRoute: typeof ExtractionsNewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  DashboardRoute: DashboardRoute,
+  ForgotPasswordRoute: ForgotPasswordRoute,
+  LoginRoute: LoginRoute,
+  SettingsRoute: SettingsRoute,
+  SignupRoute: SignupRoute,
+  ExtractionsNewRoute: ExtractionsNewRoute,
+  LeadsLeadIdRoute: LeadsLeadIdRoute,
+  ExtractionsIndexRoute: ExtractionsIndexRoute,
+  LeadsIndexRoute: LeadsIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-  }
-}
