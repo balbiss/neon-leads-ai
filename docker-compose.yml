@@ -1,7 +1,6 @@
 services:
   visita-ia-leads:
-    image: visita-ia-leads:latest
-    build: .
+    image: inoovaweb/visita-ia-leads:latest
     ports:
       - "3000:3000"
     environment:
