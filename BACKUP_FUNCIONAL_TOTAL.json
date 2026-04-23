@@ -1,0 +1,504 @@
+{
+  "name": "Super Extração Google Maps - Multi-Usuário SAAS (RECUPERADO)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "start-extraction",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [-912, -64],
+      "id": "1587751f-d3ec-4c27-bbdb-28cdcdbb8831",
+      "name": "Webhook Trigger"
+    },
+    {
+      "parameters": {
+        "url": "=https://api.apify.com/v2/datasets/{{ $node[\"Run an Actor\"].json.defaultDatasetId }}/items",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [-368, -336],
+      "id": "c33e2193-cdfb-4bd9-b437-65d47bc9f10d",
+      "name": "Google - Buscar Lugares",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "YvVp5wK2z7A6L8M",
+          "name": "Apify API Token"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "data",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.itemLists",
+      "typeVersion": 3,
+      "position": [-128, -336],
+      "id": "66b5bcd6-4c62-4c44-9de9-664ff776372d",
+      "name": "Separar Resultados"
+    },
+    {
+      "parameters": {
+        "maxItems": 10
+      },
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [80, -336],
+      "id": "b9dc4361-0da2-4a71-913e-2d12a9f56193",
+      "name": "Limitar Resultados"
+    },
+    {
+      "parameters": {
+        "url": "=https://api.apify.com/v2/datasets/{{ $node[\"Run an Actor\"].json.defaultDatasetId }}/items",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [272, -336],
+      "id": "2e3003c1-6d5a-4db4-89e7-7001ad70f943",
+      "name": "Google - Pegar Detalhes",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "YvVp5wK2z7A6L8M",
+          "name": "Apify API Token"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "insert",
+        "tableId": "leads",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "name",
+              "fieldValue": "={{ $json.name }}"
+            },
+            {
+              "fieldId": "phone",
+              "fieldValue": "={{ $json.phone }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [672, -336],
+      "id": "6fa6d95d-d436-4a77-bedb-10d4d0a3ba1e",
+      "name": "Salvar Lead",
+      "credentials": {
+        "supabaseApi": {
+          "id": "K7Mv5wK2z7A6L8S",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "extractions",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id",
+              "keyValue": "={{ $item(0).$node[\"Webhook Trigger\"].json.body.extraction_id }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "status",
+              "fieldValue": "completed"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [864, -336],
+      "id": "0bb4fe4e-1f3e-4e4b-8cda-75507a9c89e7",
+      "name": "Finalizar Extração",
+      "credentials": {
+        "supabaseApi": {
+          "id": "K7Mv5wK2z7A6L8S",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://api.apify.com/v2/datasets/{{ $node[\"Run an Actor\"].json.defaultDatasetId }}/items",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [464, -336],
+      "id": "57704916-94cc-4c42-b7dd-322734738a6a",
+      "name": "CHECK1",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "YvVp5wK2z7A6L8M",
+          "name": "Apify API Token"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "dataType": "string",
+        "value": "={{ $json.body.source }}",
+        "rules": {
+          "rules": [
+            {
+              "operation": "equal",
+              "value": "google_maps"
+            },
+            {
+              "operation": "equal",
+              "value": "olx"
+            },
+            {
+              "operation": "equal",
+              "value": "instagram"
+            },
+            {
+              "operation": "equal",
+              "value": "zap"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [-656, -96],
+      "id": "ed7a387f-3df5-49f2-9d5c-8506cae96874",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "actorId": "X8XU8wp5fgyRVufIF",
+        "customBody": "={\n  \"location\": \"{{ $json.body.config.city }}\",\n  \"limit\": {{ $json.body.config.limit }},\n  \"type\": \"SALE\",\n  \"unitUsage\": \"RESIDENTIAL\",\n  \"proxy\": {\n    \"useApifyProxy\": true,\n    \"apifyProxyGroups\": [\"RESIDENTIAL\"],\n    \"countryCode\": \"BR\"\n  }\n}\n"
+      },
+      "type": "@apify/n8n-nodes-apify.apify",
+      "typeVersion": 1,
+      "position": [-368, 240],
+      "id": "6b34ba52-e5dc-4e27-b4ab-aa6a5d75591c",
+      "name": "OLX",
+      "credentials": {
+        "apifyApi": {
+          "id": "L8Jv5wK2z7A6M9N",
+          "name": "Apify account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getDatasetItems",
+        "datasetId": "={{ $json.defaultDatasetId }}"
+      },
+      "type": "@apify/n8n-nodes-apify.apify",
+      "typeVersion": 1,
+      "position": [-128, 240],
+      "id": "1ead934e-57bf-4cd1-a659-e136e74aa76f",
+      "name": "Get dataset items2",
+      "credentials": {
+        "apifyApi": {
+          "id": "L8Jv5wK2z7A6M9N",
+          "name": "Apify account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "4c7a5b3d",
+              "leftValue": "={{ $json.entities.seller.name }}",
+              "operator": {
+                "operation": "notContains",
+                "type": "string"
+              },
+              "rightValue": "Imobiliária"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2,
+      "position": [80, 240],
+      "id": "466d9296-137b-4733-ac03-3fbb9b35fde1",
+      "name": "Filter"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "cf3a4fc9-240e-4af2-9d0e-a7edee770c29",
+              "name": "name",
+              "value": "={{ $json.entities.seller.name }}",
+              "type": "string"
+            },
+            {
+              "id": "7fdda9e7-0444-4e06-add5-91daf0d03f40",
+              "name": "whatsapp",
+              "value": "={{ $json.contact.whatsapp }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [304, 240],
+      "id": "97a229c9-e5c4-4ca8-8335-46d2277f694a",
+      "name": "DADOS"
+    },
+    {
+      "parameters": {
+        "operation": "insert",
+        "tableId": "leads",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "name",
+              "fieldValue": "={{ $json.name }}"
+            },
+            {
+              "fieldId": "phone",
+              "fieldValue": "={{ $json.whatsapp }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [500, 240],
+      "id": "salvar-lead-zap-id",
+      "name": "Salvar Lead ZAP",
+      "credentials": {
+        "supabaseApi": {
+          "id": "K7Mv5wK2z7A6L8S",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "extractions",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id",
+              "keyValue": "={{ $item(0).$node[\"Webhook Trigger\"].json.body.extraction_id }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "status",
+              "fieldValue": "completed"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [750, 240],
+      "id": "finalizar-extracao-zap-id",
+      "name": "Finalizar Extração ZAP",
+      "credentials": {
+        "supabaseApi": {
+          "id": "K7Mv5wK2z7A6L8S",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 5,
+        "unit": "seconds"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1,
+      "position": [600, 380],
+      "id": "wait-zap-id-v2",
+      "name": "Wait ZAP FINAL"
+    }
+  ],
+  "connections": {
+    "Webhook Trigger": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google - Buscar Lugares": {
+      "main": [
+        [
+          {
+            "node": "Separar Resultados",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Separar Resultados": {
+      "main": [
+        [
+          {
+            "node": "Limitar Resultados",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limitar Resultados": {
+      "main": [
+        [
+          {
+            "node": "Google - Pegar Detalhes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google - Pegar Detalhes": {
+      "main": [
+        [
+          {
+            "node": "CHECK1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Salvar Lead": {
+      "main": [
+        [
+          {
+            "node": "Finalizar Extração",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CHECK1": {
+      "main": [
+        [
+          {
+            "node": "Salvar Lead",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Google - Buscar Lugares",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [],
+        [],
+        [
+          {
+            "node": "OLX",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OLX": {
+      "main": [
+        [
+          {
+            "node": "Get dataset items2",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Wait ZAP FINAL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get dataset items2": {
+      "main": [
+        [
+          {
+            "node": "Filter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter": {
+      "main": [
+        [
+          {
+            "node": "DADOS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DADOS": {
+      "main": [
+        [
+          {
+            "node": "Salvar Lead ZAP",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait ZAP FINAL": {
+      "main": [
+        [
+          {
+            "node": "Finalizar Extração ZAP",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

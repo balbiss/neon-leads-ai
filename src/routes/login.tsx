@@ -1,6 +1,8 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { Logo } from "@/components/Logo";
+import { supabase } from "@/lib/supabase";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/login")({
   head: () => ({ meta: [{ title: "Login — Visita IA Leads" }] }),
@@ -11,10 +13,28 @@ function LoginPage() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setTimeout(() => navigate({ to: "/dashboard" }), 400);
+    
+    // Get form data
+    const formData = new FormData(e.target as HTMLFormElement);
+    const email = formData.get("email") as string;
+    const password = formData.get("password") as string;
+
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (error) {
+      toast.error(error.message);
+      setLoading(true);
+      setTimeout(() => setLoading(false), 500);
+      return;
+    }
+
+    navigate({ to: "/dashboard" });
   };
 
   return (
@@ -32,6 +52,7 @@ function LoginPage() {
               <label className="label-caps">Email</label>
               <input
                 type="email"
+                name="email"
                 required
                 className="mt-1.5 w-full rounded-lg border border-[color:var(--border)] bg-[#1a1a1a] px-3 py-2.5 text-sm text-foreground focus:border-[color:var(--neon)]/50 focus:outline-none"
                 placeholder="voce@email.com"
@@ -46,6 +67,7 @@ function LoginPage() {
               </div>
               <input
                 type="password"
+                name="password"
                 required
                 className="mt-1.5 w-full rounded-lg border border-[color:var(--border)] bg-[#1a1a1a] px-3 py-2.5 text-sm text-foreground focus:border-[color:var(--neon)]/50 focus:outline-none"
                 placeholder="••••••••"

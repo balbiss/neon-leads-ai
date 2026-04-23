@@ -1,4 +1,4 @@
-import { Link, useRouterState } from "@tanstack/react-router";
+import { Link, useRouterState, useNavigate } from "@tanstack/react-router";
 import {
   LayoutGrid,
   Download,
@@ -13,20 +13,14 @@ import {
 } from "lucide-react";
 import { Logo } from "./Logo";
 import { cn } from "@/lib/utils";
+import { supabase } from "@/lib/supabase";
+import { toast } from "sonner";
+import { useProfile } from "@/hooks/useProfile";
 
 const mainItems = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutGrid },
   { to: "/extractions", label: "Minhas Extrações", icon: Download },
   { to: "/leads", label: "Leads", icon: Users },
-  { to: "/monitoring", label: "Monitoramento", icon: Activity },
-  { to: "/reports", label: "Relatórios", icon: BarChart3 },
-  { to: "/garimpador", label: "Garimpador VivaReal & ZAP", icon: Search },
-];
-
-const settingsItems = [
-  { to: "/plan", label: "Meu Plano", icon: CreditCard },
-  { to: "/admin", label: "Administração", icon: Shield },
-  { to: "/settings", label: "Configurações", icon: Settings },
 ];
 
 function NavItem({
@@ -63,7 +57,28 @@ function NavItem({
 
 export function AppSidebar() {
   const { location } = useRouterState();
+  const navigate = useNavigate();
+  const { profile } = useProfile();
   const path = location.pathname;
+
+  const settingsItems = [
+    { to: "/settings", label: "Configurações", icon: Settings },
+  ];
+
+  if (profile?.role === 'admin') {
+    settingsItems.unshift({ to: "/admin", label: "Administração", icon: Shield });
+  }
+
+  const handleLogout = async () => {
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+      toast.success("Sessão encerrada");
+      navigate({ to: "/login" });
+    } catch (error: any) {
+      toast.error("Erro ao sair");
+    }
+  };
 
   return (
     <aside className="flex h-screen w-[240px] shrink-0 flex-col border-r border-[color:var(--border)] bg-sidebar">
@@ -89,7 +104,10 @@ export function AppSidebar() {
       </nav>
 
       <div className="border-t border-[color:var(--border)] p-3">
-        <button className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-white/5 hover:text-foreground">
+        <button 
+          onClick={handleLogout}
+          className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-white/5 hover:text-foreground"
+        >
           <LogOut className="h-4 w-4" />
           Sair
         </button>

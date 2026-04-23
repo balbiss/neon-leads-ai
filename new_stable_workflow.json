@@ -1,0 +1,162 @@
+{
+  "name": "Visita IA Leads - Estável v1",
+  "nodes": [
+    {
+      "id": "webhook-1",
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [-900, 0],
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "start-extraction-v2",
+        "responseMode": "onReceived",
+        "options": {}
+      }
+    },
+    {
+      "id": "switch-1",
+      "name": "Switch",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [-650, 0],
+      "parameters": {
+        "dataType": "string",
+        "value": "={{ $json.body.source }}",
+        "rules": {
+          "rules": [
+            { "operation": "equal", "value": "google_maps" },
+            { "operation": "equal", "value": "olx" },
+            { "operation": "equal", "value": "instagram" },
+            { "operation": "equal", "value": "zap" }
+          ]
+        }
+      }
+    },
+    {
+      "id": "zap-actor-1",
+      "name": "ZAP Actor",
+      "type": "@apify/n8n-nodes-apify.apify",
+      "typeVersion": 1,
+      "position": [-350, 250],
+      "parameters": {
+        "actorId": "X8XU8wp5fgyRVufIF",
+        "customBody": "={\n  \"location\": \"{{ $json.body.config.city }}\",\n  \"limit\": {{ $json.body.config.limit }},\n  \"type\": \"SALE\",\n  \"unitUsage\": \"RESIDENTIAL\",\n  \"proxy\": {\n    \"useApifyProxy\": true,\n    \"apifyProxyGroups\": [\"RESIDENTIAL\"],\n    \"countryCode\": \"BR\"\n  }\n}\n"
+      },
+      "credentials": { "apifyApi": { "id": "L8Jv5wK2z7A6M9N", "name": "Apify account" } }
+    },
+    {
+      "id": "get-dataset-1",
+      "name": "Get ZAP Items",
+      "type": "@apify/n8n-nodes-apify.apify",
+      "typeVersion": 1,
+      "position": [-100, 250],
+      "parameters": {
+        "operation": "getDatasetItems",
+        "datasetId": "={{ $json.defaultDatasetId }}"
+      },
+      "credentials": { "apifyApi": { "id": "L8Jv5wK2z7A6M9N", "name": "Apify account" } }
+    },
+    {
+      "id": "type-check-1",
+      "name": "Tipo Anunciante?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [150, 250],
+      "parameters": {
+        "conditions": {
+          "combinator": "and",
+          "conditions": [
+            {
+              "leftValue": "={{ $node[\"Webhook Trigger\"].json.body.config.seller_type }}",
+              "operator": { "operation": "equals", "type": "string" },
+              "rightValue": "all"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "filter-1",
+      "name": "Filter Pro",
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2,
+      "position": [400, 350],
+      "parameters": {
+        "conditions": {
+          "combinator": "and",
+          "conditions": [
+            {
+              "leftValue": "={{ $json.entities.seller.name }}",
+              "operator": { "operation": "notContains", "type": "string" },
+              "rightValue": "Imobiliária"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "data-map-1",
+      "name": "Mapear Dados",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3,
+      "position": [650, 250],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            { "name": "name", "value": "={{ $json.entities.seller.name || 'Sem nome' }}", "type": "string" },
+            { "name": "whatsapp", "value": "={{ $json.contact.whatsapp }}", "type": "string" },
+            { "name": "city", "value": "={{ $item(0).$node[\"Webhook Trigger\"].json.body.config.city }}", "type": "string" },
+            { "name": "extraction_id", "value": "={{ $item(0).$node[\"Webhook Trigger\"].json.body.extraction_id }}", "type": "string" },
+            { "name": "user_id", "value": "={{ $item(0).$node[\"Webhook Trigger\"].json.body.user_id }}", "type": "string" }
+          ]
+        }
+      }
+    },
+    {
+      "id": "save-lead-1",
+      "name": "Salvar no Supabase",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [900, 250],
+      "parameters": {
+        "operation": "insert",
+        "tableId": "leads",
+        "fieldsUi": {
+          "fieldValues": [
+            { "fieldId": "name", "fieldValue": "={{ $json.name }}" },
+            { "fieldId": "phone", "fieldValue": "={{ $json.whatsapp }}" },
+            { "fieldId": "extraction_id", "fieldValue": "={{ $json.extraction_id }}" },
+            { "fieldId": "user_id", "fieldValue": "={{ $json.user_id }}" },
+            { "fieldId": "source", "fieldValue": "zap" }
+          ]
+        }
+      },
+      "credentials": { "supabaseApi": { "id": "K7Mv5wK2z7A6L8S", "name": "Supabase account" } }
+    },
+    {
+      "id": "finish-ext-1",
+      "name": "Finalizar Extração",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [1150, 250],
+      "parameters": {
+        "operation": "update",
+        "tableId": "extractions",
+        "filters": { "conditions": [ { "keyName": "id", "keyValue": "={{ $item(0).$node[\"Webhook Trigger\"].json.body.extraction_id }}" } ] },
+        "fieldsUi": { "fieldValues": [ { "fieldId": "status", "fieldValue": "completed" } ] }
+      },
+      "credentials": { "supabaseApi": { "id": "K7Mv5wK2z7A6L8S", "name": "Supabase account" } }
+    }
+  ],
+  "connections": {
+    "Webhook Trigger": { "main": [ [ { "node": "Switch", "type": "main", "index": 0 } ] ] },
+    "Switch": { "main": [ [], [], [], [ { "node": "ZAP Actor", "type": "main", "index": 0 } ] ] },
+    "ZAP Actor": { "main": [ [ { "node": "Get ZAP Items", "type": "main", "index": 0 } ] ] },
+    "Get ZAP Items": { "main": [ [ { "node": "Tipo Anunciante?", "type": "main", "index": 0 } ] ] },
+    "Tipo Anunciante?": { "main": [ [ { "node": "Mapear Dados", "type": "main", "index": 0 } ], [ { "node": "Filter Pro", "type": "main", "index": 0 } ] ] },
+    "Filter Pro": { "main": [ [ { "node": "Mapear Dados", "type": "main", "index": 0 } ] ] },
+    "Mapear Dados": { "main": [ [ { "node": "Salvar No Supabase", "type": "main", "index": 0 } ] ] },
+    "Salvar No Supabase": { "main": [ [ { "node": "Finalizar Extração", "type": "main", "index": 0 } ] ] }
+  }
+}

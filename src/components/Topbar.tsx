@@ -1,7 +1,14 @@
-import { Bell, Search } from "lucide-react";
+import { Bell, Search, Loader2 } from "lucide-react";
 import { NeonBadge } from "./NeonBadge";
+import { useProfile } from "@/hooks/useProfile";
 
 export function Topbar({ title, subtitle }: { title: string; subtitle?: string }) {
+  const { profile, loading } = useProfile();
+
+  const getInitials = (name: string) => {
+    return name?.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2) || '??';
+  };
+
   return (
     <header className="flex h-16 items-center justify-between border-b border-[#1f1f1f] bg-[#0d0d0d] px-6">
       <div>
@@ -25,19 +32,21 @@ export function Topbar({ title, subtitle }: { title: string; subtitle?: string }
 
         <button className="relative rounded-lg border border-[color:var(--border)] bg-[#1a1a1a] p-2 text-muted-foreground transition-colors hover:text-foreground">
           <Bell className="h-4 w-4" />
-          <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-[color:var(--neon)] text-[10px] font-bold text-black">
-            3
-          </span>
         </button>
 
         <div className="flex items-center gap-3 border-l border-[color:var(--border)] pl-4">
-          <div className="text-right">
-            <div className="text-sm font-medium text-foreground">João Silva</div>
-            <div className="text-xs text-muted-foreground">Admin</div>
-          </div>
-          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[color:var(--neon)]/15 text-sm font-semibold neon-text">
-            JS
-          </div>
+          {loading ? (
+            <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+          ) : (
+            <>
+              <div className="text-right">
+                <div className="text-sm font-medium text-foreground">{profile?.name || 'Usuário'}</div>
+              </div>
+              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[color:var(--neon)]/15 text-sm font-semibold neon-text">
+                {getInitials(profile?.name || '??')}
+              </div>
+            </>
+          )}
         </div>
       </div>
     </header>
