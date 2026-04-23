@@ -1,10 +1,13 @@
 services:
   visita-ia-leads:
+    image: visita-ia-leads:latest
     build: .
-    restart: always
     ports:
       - "3000:3000"
     environment:
       - NODE_ENV=production
       - VITE_SUPABASE_URL=${VITE_SUPABASE_URL}
       - VITE_SUPABASE_ANON_KEY=${VITE_SUPABASE_ANON_KEY}
+    deploy:
+      restart_policy:
+        condition: on-failure
