@@ -1,0 +1,17 @@
+services:
+  visita-ia-leads:
+    build: .
+    container_name: visita-ia-leads
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - VITE_SUPABASE_URL=${VITE_SUPABASE_URL}
+      - VITE_SUPABASE_ANON_KEY=${VITE_SUPABASE_ANON_KEY}
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    external: true
