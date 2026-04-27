@@ -1,30 +1,22 @@
-# Use a imagem oficial do Bun
-FROM oven/bun:latest as builder
-
+FROM oven/bun:latest
 WORKDIR /app
 
-# Copia os arquivos de dependências
+# Variáveis para o Build (Vite precisa delas no momento do build)
+ARG VITE_SUPABASE_URL
+ARG VITE_SUPABASE_ANON_KEY
+
 COPY package.json bun.lockb ./
+RUN bun install
 
-# Instala as dependências
-RUN bun install --frozen-lockfile
-
-# Copia o restante do código
 COPY . .
 
-# Faz o build do projeto
+# Injeta as variáveis no .env para o build
+RUN echo "VITE_SUPABASE_URL=$VITE_SUPABASE_URL" > .env && \
+    echo "VITE_SUPABASE_ANON_KEY=$VITE_SUPABASE_ANON_KEY" >> .env
+
 RUN bun run build
 
-# Estágio de produção
-FROM oven/bun:latest as runner
+EXPOSE 3001
 
-WORKDIR /app
-
-# Copia apenas o necessário do estágio de build
-COPY --from=builder /app/.output ./.output
-COPY --from=builder /app/package.json ./package.json
-
-EXPOSE 3000
-
-# Comando para iniciar o servidor do TanStack Start
-CMD ["bun", "run", ".output/server/index.mjs"]
+# Nosso servidor customizado que resolve o problema de assets no Linux
+CMD ["bun", "run", "entry.js"]
