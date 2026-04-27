@@ -245,6 +245,7 @@ function LeadsPage() {
               <th className="label-caps px-4 py-3">Cidade</th>
               <th className="label-caps px-4 py-3">Fonte</th>
               <th className="label-caps px-4 py-3">Status</th>
+              <th className="label-caps px-4 py-3">Entrega</th>
               <th className="label-caps px-4 py-3">Data</th>
             </tr>
           </thead>
@@ -319,6 +320,21 @@ function LeadsPage() {
                     <NeonBadge variant={l.status === "qualified" ? "neon" : "neutral"}>
                         {statusMap[l.status] || l.status}
                     </NeonBadge>
+                </td>
+                <td className="px-4 py-3">
+                  {l.delivery_status === 'sent' ? (
+                    <span className="inline-flex rounded-full bg-green-500/20 px-2 py-0.5 text-[10px] font-bold text-green-400 uppercase border border-green-500/30">
+                      Enviado ✅
+                    </span>
+                  ) : l.delivery_status === 'error' ? (
+                    <span className="inline-flex rounded-full bg-red-500/20 px-2 py-0.5 text-[10px] font-bold text-red-400 uppercase border border-red-500/30" title={l.delivery_error}>
+                      Erro ❌
+                    </span>
+                  ) : (
+                    <span className="inline-flex rounded-full bg-yellow-500/10 px-2 py-0.5 text-[10px] font-bold text-yellow-500/60 uppercase border border-yellow-500/20">
+                      Aguardando
+                    </span>
+                  )}
                 </td>
                 <td className="px-4 py-3 text-muted-foreground text-xs">
                     {new Date(l.created_at).toLocaleDateString('pt-BR')}
