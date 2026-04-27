@@ -25,6 +25,8 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/visita-ia-leads:latest
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/visita-ia-leads:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/visita-ia-leads:v12
           cache-from: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/visita-ia-leads:buildcache
           cache-to: type=inline
