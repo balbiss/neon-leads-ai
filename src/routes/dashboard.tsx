@@ -25,14 +25,12 @@ const sourceIcons = {
   google_maps: MapPin,
   vivareal: Home,
   zap: Building2,
-  instagram: Instagram,
 };
 
 const sourceNames = {
   google_maps: "Google Maps",
   vivareal: "VivaReal",
   zap: "ZAP Imóveis",
-  instagram: "Instagram",
 };
 
 function DashboardPage() {

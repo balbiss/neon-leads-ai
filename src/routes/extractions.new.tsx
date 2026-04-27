@@ -154,7 +154,6 @@ function NewExtractionPage() {
                 >
                 <option value="google_maps">Google Maps</option>
                 <option value="zap">ZAP Imóveis</option>
-                <option value="instagram">Instagram</option>
                 </select>
             </Field>
 

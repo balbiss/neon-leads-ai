@@ -29,7 +29,6 @@ const sourceNames: Record<string, string> = {
   google_maps: "Google Maps",
   vivareal: "VivaReal",
   zap: "ZAP Imóveis",
-  instagram: "Instagram",
 };
 
 const statusMap: Record<string, string> = {
@@ -197,7 +196,6 @@ function LeadsPage() {
           <option value="google_maps">Google Maps</option>
           <option value="vivareal">VivaReal</option>
           <option value="zap">ZAP</option>
-          <option value="instagram">Instagram</option>
         </select>
         <select 
             className="rounded-lg border border-[color:var(--border)] bg-[#1a1a1a] px-3 py-2 text-sm"
