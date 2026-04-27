@@ -1,11 +1,12 @@
 import { createFileRoute, Link, useSearch } from "@tanstack/react-router";
-import { Download, Filter, Loader2, Search, MessageCircle, MapPin, Globe, ExternalLink } from "lucide-react";
+import { Download, Filter, Loader2, Search, MessageCircle, MapPin, Globe, ExternalLink, Send } from "lucide-react";
 import { AppLayout } from "@/components/AppLayout";
 import { NeonBadge } from "@/components/NeonBadge";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { toast } from "sonner";
 import { z } from "zod";
+import { BulkMessageModal } from "@/components/BulkMessageModal";
 
 const leadsSearchSchema = z.object({
   extractionId: z.string().optional(),
@@ -47,6 +48,10 @@ function LeadsPage() {
   const [sourceFilter, setSourceFilter] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
   const [exporting, setExporting] = useState(false);
+  
+  // Estados para seleção em massa
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [isBulkModalOpen, setIsBulkModalOpen] = useState(false);
 
   useEffect(() => {
     fetchLeads();
@@ -81,6 +86,7 @@ function LeadsPage() {
       const { data, error } = await query;
       if (error) throw error;
       setLeads(data || []);
+      setSelectedIds(new Set()); // Limpa seleção ao mudar filtros
     } catch (error: any) {
       toast.error("Erro ao carregar leads");
     } finally {
@@ -115,6 +121,26 @@ function LeadsPage() {
       setExporting(false);
     }
   };
+
+  const toggleSelectLead = (id: string) => {
+    const newSelected = new Set(selectedIds);
+    if (newSelected.has(id)) {
+      newSelected.delete(id);
+    } else {
+      newSelected.add(id);
+    }
+    setSelectedIds(newSelected);
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedIds.size === leads.length) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(leads.map(l => l.id)));
+    }
+  };
+
+  const selectedLeadsData = leads.filter(l => selectedIds.has(l.id));
 
   return (
     <AppLayout 
@@ -151,6 +177,17 @@ function LeadsPage() {
                 onKeyDown={(e) => e.key === 'Enter' && fetchLeads()}
             />
         </div>
+
+        {selectedIds.size > 0 && (
+          <button 
+            onClick={() => setIsBulkModalOpen(true)}
+            className="inline-flex items-center gap-2 rounded-lg bg-green-500 px-4 py-2 text-sm font-bold text-black hover:bg-green-400 transition-colors"
+          >
+            <Send className="h-4 w-4" /> 
+            🚀 Enviar Campanha ({selectedIds.size})
+          </button>
+        )}
+
         <select 
             className="rounded-lg border border-[color:var(--border)] bg-[#1a1a1a] px-3 py-2 text-sm"
             value={sourceFilter}
@@ -174,6 +211,8 @@ function LeadsPage() {
           <option value="discarded">Descartado</option>
         </select>
         
+
+
         <button 
             disabled={exporting}
             onClick={handleExport}
@@ -188,7 +227,14 @@ function LeadsPage() {
         <table className="w-full text-sm text-left">
           <thead>
             <tr className="border-b border-[color:var(--border)]">
-              <th className="px-4 py-3"><input type="checkbox" className="accent-[color:var(--neon)]" /></th>
+              <th className="px-4 py-3">
+                <input 
+                  type="checkbox" 
+                  className="accent-[color:var(--neon)]" 
+                  checked={leads.length > 0 && selectedIds.size === leads.length}
+                  onChange={toggleSelectAll}
+                />
+              </th>
               <th className="label-caps px-4 py-3">Nome / Empresa</th>
               <th className="label-caps px-4 py-3">Telefone</th>
               <th className="label-caps px-4 py-3">Nº WhatsApp</th>
@@ -216,8 +262,15 @@ function LeadsPage() {
                     </td>
                 </tr>
             ) : leads.map((l) => (
-              <tr key={l.id} className="border-b border-[color:var(--border)] last:border-0 transition-colors hover:bg-[#1a1a1a]">
-                <td className="px-4 py-3"><input type="checkbox" className="accent-[color:var(--neon)]" /></td>
+              <tr key={l.id} className={`border-b border-[color:var(--border)] last:border-0 transition-colors hover:bg-[#1a1a1a] ${selectedIds.has(l.id) ? 'bg-[color:var(--neon)]/5' : ''}`}>
+                <td className="px-4 py-3">
+                  <input 
+                    type="checkbox" 
+                    className="accent-[color:var(--neon)]" 
+                    checked={selectedIds.has(l.id)}
+                    onChange={() => toggleSelectLead(l.id)}
+                  />
+                </td>
                 <td className="px-4 py-3 font-medium">
                   <Link to="/leads/$leadId" params={{ leadId: l.id }} className="hover:neon-text">{l.name}</Link>
                 </td>
@@ -275,6 +328,12 @@ function LeadsPage() {
           </tbody>
         </table>
       </div>
+
+      <BulkMessageModal 
+        isOpen={isBulkModalOpen}
+        onClose={() => setIsBulkModalOpen(false)}
+        selectedLeads={selectedLeadsData}
+      />
     </AppLayout>
   );
 }
