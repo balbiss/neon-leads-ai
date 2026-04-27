@@ -24,11 +24,11 @@ interface BulkMessageModalProps {
 export function BulkMessageModal({ isOpen, onClose, selectedLeads }: BulkMessageModalProps) {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
-  const [mediaType, setMediaType] = useState("text");
+  const [mediaType, setMediaType] = useState("texto");
   const [mediaUrl, setMediaUrl] = useState("");
 
   const handleSend = async () => {
-    if (!message && mediaType === "text") {
+    if (!message && mediaType === "texto") {
       toast.error("Por favor, escreva uma mensagem.");
       return;
     }
@@ -42,6 +42,7 @@ export function BulkMessageModal({ isOpen, onClose, selectedLeads }: BulkMessage
         action: "bulk_message",
         timestamp: new Date().toISOString(),
         totalLeads: selectedLeads.length,
+        type: mediaType, // "texto" ou "imagem"
         message,
         mediaType,
         mediaUrl,
@@ -91,10 +92,10 @@ export function BulkMessageModal({ isOpen, onClose, selectedLeads }: BulkMessage
         </DialogHeader>
 
         <div className="grid gap-6 py-4">
-          <Tabs defaultValue="text" onValueChange={setMediaType} className="w-full">
+          <Tabs defaultValue="texto" onValueChange={setMediaType} className="w-full">
             <TabsList className="grid w-full grid-cols-2 bg-black/40 border border-[color:var(--border)] p-1 h-auto">
               <TabsTrigger 
-                value="text" 
+                value="texto" 
                 className="py-2 data-[state=active]:bg-[color:var(--neon)]/10 data-[state=active]:text-[color:var(--neon)]"
               >
                 <div className="flex flex-col items-center gap-1">
@@ -103,7 +104,7 @@ export function BulkMessageModal({ isOpen, onClose, selectedLeads }: BulkMessage
                 </div>
               </TabsTrigger>
               <TabsTrigger 
-                value="image" 
+                value="imagem" 
                 className="py-2 data-[state=active]:bg-[color:var(--neon)]/10 data-[state=active]:text-[color:var(--neon)]"
               >
                 <div className="flex flex-col items-center gap-1">
@@ -128,7 +129,7 @@ export function BulkMessageModal({ isOpen, onClose, selectedLeads }: BulkMessage
                 </p>
               </div>
 
-              {mediaType === "image" && (
+              {mediaType === "imagem" && (
                 <div className="space-y-2 animate-in zoom-in-95 duration-200">
                   <Label htmlFor="url" className="text-muted-foreground">URL do arquivo (Imagem)</Label>
                   <Input
