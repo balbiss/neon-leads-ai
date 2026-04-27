@@ -12,7 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { MessageSquare, Image, Video, Send, Loader2 } from "lucide-react";
+import { MessageSquare, Image, Send, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 interface BulkMessageModalProps {
@@ -92,7 +92,7 @@ export function BulkMessageModal({ isOpen, onClose, selectedLeads }: BulkMessage
 
         <div className="grid gap-6 py-4">
           <Tabs defaultValue="text" onValueChange={setMediaType} className="w-full">
-            <TabsList className="grid w-full grid-cols-3 bg-black/40 border border-[color:var(--border)] p-1 h-auto">
+            <TabsList className="grid w-full grid-cols-2 bg-black/40 border border-[color:var(--border)] p-1 h-auto">
               <TabsTrigger 
                 value="text" 
                 className="py-2 data-[state=active]:bg-[color:var(--neon)]/10 data-[state=active]:text-[color:var(--neon)]"
@@ -109,15 +109,6 @@ export function BulkMessageModal({ isOpen, onClose, selectedLeads }: BulkMessage
                 <div className="flex flex-col items-center gap-1">
                     <Image className="h-4 w-4" />
                     <span className="text-[10px]">Imagem</span>
-                </div>
-              </TabsTrigger>
-              <TabsTrigger 
-                value="video" 
-                className="py-2 data-[state=active]:bg-[color:var(--neon)]/10 data-[state=active]:text-[color:var(--neon)]"
-              >
-                <div className="flex flex-col items-center gap-1">
-                    <Video className="h-4 w-4" />
-                    <span className="text-[10px]">Vídeo</span>
                 </div>
               </TabsTrigger>
             </TabsList>
@@ -137,9 +128,9 @@ export function BulkMessageModal({ isOpen, onClose, selectedLeads }: BulkMessage
                 </p>
               </div>
 
-              {(mediaType === "image" || mediaType === "video") && (
+              {mediaType === "image" && (
                 <div className="space-y-2 animate-in zoom-in-95 duration-200">
-                  <Label htmlFor="url" className="text-muted-foreground">URL do arquivo ({mediaType === "image" ? "Imagem" : "Vídeo"})</Label>
+                  <Label htmlFor="url" className="text-muted-foreground">URL do arquivo (Imagem)</Label>
                   <Input
                     id="url"
                     placeholder="https://suaimagem.com/foto.png"
